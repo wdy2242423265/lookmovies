@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.qhit.lookMovies.dao.ILookMoviesDao"> 
+	<!-- 自定义结果集 --> 
+	<resultMap id="BaseResultMap" type="com.qhit.lookMovies.pojo.LookMovies"> 
+		<id property="moviesid" column="moviesid" javaType="java.lang.Integer"></id> 
+		<result property="moviesName" column="movies_name" javaType="java.lang.String"></result> 
+		<result property="pinyin" column="pinyin" javaType="java.lang.String"></result> 
+		<result property="datetime" column="datetime" javaType="java.lang.String"></result> 
+		<result property="grade" column="grade" javaType="java.lang.Integer"></result> 
+		<result property="image" column="image" javaType="java.lang.String"></result> 
+		<result property="sonImage" column="son_image" javaType="java.lang.String"></result>
+
+		<result property="categoryid" column="categoryid" javaType="java.lang.Integer"></result>
+	</resultMap> 
+
+	<!-- 在各种标签中，id属性必须与接口中的方法名一样，id的值必须是唯一的，parameterType指查询时使用的参数类型， 
+	resultType属性指明查询返回的结果集类型    --> 
+ 
+	<sql id="Base_Column_List" > 
+		moviesid,movies_name,pinyin,datetime,grade,image,son_image 
+	</sql> 
+	<select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Integer" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from look_movies 
+		where moviesid = #{moviesid} 
+	</select> 
+	<delete id="delete" parameterType="java.lang.Integer" > 
+		delete from look_movies 
+		where moviesid = #{moviesid} 
+	</delete> 
+	<insert id="insert" parameterType="com.qhit.lookMovies.pojo.LookMovies" > 
+		insert into look_movies(movies_name,pinyin,datetime,grade,image,son_image) 
+		values (#{moviesName},#{pinyin},#{datetime},#{grade},#{image},#{sonImage}) 
+	</insert> 
+	<update id="updateSelective" parameterType="com.qhit.lookMovies.pojo.LookMovies" > 
+		update look_movies 
+		<set > 
+			<if test="moviesName != null and moviesName!='' " > 
+				movies_name = #{moviesName}, 
+			</if> 
+			<if test="pinyin != null and pinyin!='' " > 
+				pinyin = #{pinyin}, 
+			</if> 
+			<if test="datetime != null and datetime!='' " > 
+				datetime = #{datetime}, 
+			</if> 
+			<if test="grade != null and grade!='' " > 
+				grade = #{grade}, 
+			</if> 
+			<if test="image != null and image!='' " > 
+				image = #{image}, 
+			</if> 
+			<if test="sonImage != null and sonImage!='' " > 
+				son_image = #{sonImage}, 
+			</if> 
+		</set> 
+		where moviesid = #{moviesid} 
+	</update> 
+	<update id="update" parameterType="com.qhit.lookMovies.pojo.LookMovies" > 
+		update look_movies 
+		set  movies_name = #{moviesName}, pinyin = #{pinyin}, datetime = #{datetime}, grade = #{grade}, image = #{image}, son_image = #{sonImage} 
+		where moviesid = #{moviesid} 
+	</update> 
+	<select id="findAll" resultMap="BaseResultMap" > 
+		<!--select-->
+		<!--<include refid="Base_Column_List" />-->
+		<!--from look_movies-->
+		SELECT *
+		FROM look_movies lm JOIN look_movies_secondcategory lms ON lm.moviesid=lms.moviesid
+		JOIN look_secondcategory ls ON ls.secondCategoryid=lms.secondCategoryid
+		JOIN look_category lc ON lc.categoryid=ls.categoryid
+		JOIN look_movies_actor lma ON lma.moviesid=lm.moviesid
+		JOIN look_actor la ON la.actorid=lma.actorid
+	</select>
+	<select id="findByMoviesName" resultMap="BaseResultMap" parameterType="java.lang.String" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from look_movies 
+		where movies_name = #{moviesName} 
+	</select> 
+	<select id="findByPinyin" resultMap="BaseResultMap" parameterType="java.lang.String" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from look_movies 
+		where pinyin = #{pinyin} 
+	</select> 
+	<select id="findByDatetime" resultMap="BaseResultMap" parameterType="java.lang.String" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from look_movies 
+		where datetime = #{datetime} 
+	</select> 
+	<select id="findByGrade" resultMap="BaseResultMap" parameterType="java.lang.Integer" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from look_movies 
+		where grade = #{grade} 
+	</select> 
+	<select id="findByImage" resultMap="BaseResultMap" parameterType="java.lang.String" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from look_movies 
+		where image = #{image} 
+	</select> 
+	<select id="findBySonImage" resultMap="BaseResultMap" parameterType="java.lang.String" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from look_movies 
+		where son_image = #{sonImage} 
+	</select> 
+	<delete id="deleteBatch" parameterType="java.util.Arrays"> 
+		delete from look_movies where moviesid in 
+		<foreach collection="array" item="id" open="(" close=")" separator=","> 
+			#{id} 
+		</foreach> 
+	</delete> 
+	<select id="search" parameterType="com.qhit.lookMovies.pojo.LookMovies" resultMap="BaseResultMap"> 
+		select * from  look_movies 
+		<where > 
+			<if test="moviesName != null and moviesName!='' " > 
+				 and movies_name = #{moviesName} 
+			</if> 
+			<if test="pinyin != null and pinyin!='' " > 
+				 and pinyin = #{pinyin} 
+			</if> 
+			<if test="datetime != null and datetime!='' " > 
+				 and datetime = #{datetime} 
+			</if> 
+			<if test="grade != null and grade!='' " > 
+				 and grade = #{grade} 
+			</if> 
+			<if test="image != null and image!='' " > 
+				 and image = #{image} 
+			</if> 
+			<if test="sonImage != null and sonImage!='' " > 
+				 and son_image = #{sonImage} 
+			</if> 
+		</where> 
+	</select>
+	<!--<select id="selectMoviesPinYin" parameterType="com.qhit.lookMovies.pojo.LookMovies" resultMap="BaseResultMap">-->
+		<!--SELECT *-->
+		<!--FROM look_movies ls-->
+		<!--WHERE 1=1-->
+		<!--and-->
+		<!--ls.pinyin LIKE "%"#{pinyin}"%"-->
+
+<!--&#45;&#45; 		"%"#{name}"%"-->
+		<!--&lt;!&ndash;<foreach collection="arr" index="index" item="item" >&ndash;&gt;-->
+			<!--&lt;!&ndash;ls.pinyin LIKE '%'#{item}'%'&ndash;&gt;-->
+		<!--&lt;!&ndash;</foreach>&ndash;&gt;-->
+	<!--</select>-->
+	<select id="selectMoviesidAndCtaegoryid" parameterType="com.qhit.lookMovies.pojo.LookMovies" resultMap="BaseResultMap">
+		select lm.moviesid,lc.categoryid
+		from look_movies lm join look_movies_secondcategory lms on lm.moviesid=lms.moviesid
+		join look_secondcategory ls on ls.secondCategoryid=lms.secondCategoryid
+		join look_category lc on lc.categoryid=ls.categoryid
+		where lm.moviesid=#{moviesid}
+	</select>
+</mapper> 
